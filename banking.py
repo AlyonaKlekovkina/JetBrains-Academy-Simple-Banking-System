@@ -1,7 +1,5 @@
 import random
 # Write your code here
-pin = ''
-card = ''
 
 
 def card_generator():
@@ -44,10 +42,10 @@ def show_balance():
             print("\nBalance: 0\n")
         elif when_logged_inp == 2:
             print("\nYou have successfully logged out!\n")
+            break
         elif when_logged_inp == 0:
             print("Bye!")
             exit(0)
-            break
 
 
 while True:
