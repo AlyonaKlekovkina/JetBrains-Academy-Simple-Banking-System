@@ -1,18 +1,18 @@
 import random
 import math
+import sqlite3
 # Write your code here
+conn = sqlite3.connect('card.s3db')
+cur = conn.cursor()
+cur.execute("CREATE TABLE if not exists card (id INTEGER, number TEXT, pin TEXT, balance INTEGER default'0');")
 
 
 def card_generator():
-    global card
     card = '400000'
     for i in range(9):
         card_number = random.choice('0123456789')
         card += card_number
 
-
-def checksum():
-    global last_digit, final_card_number
     multiplied_by_two = []
     for i in range(len(card)):
         if i % 2 == 0:
@@ -31,22 +31,21 @@ def checksum():
         nearest_tenth = int(math.ceil(result / 10.0)) * 10
         last_digit = str(nearest_tenth - result)
     final_card_number = card + last_digit
-    print("Your card number:\n", final_card_number, sep="")
+    return final_card_number
 
 
 def pin_generator():
-    global pin
-    pin = ''
+    the_pin = ''
     for i in range(4):
         pin_number = random.choice('0123456789')
-        pin += pin_number
-    print("Your card PIN:\n", pin, "\n", sep="")
+        the_pin += pin_number
+    return the_pin
 
 
 def check():
     card_inp = input("\nEnter your card number:\n")
     pin_inp = input("Enter your PIN:\n")
-    if (card_inp == final_card_number) and (pin_inp == pin):
+    if (card_inp == number) and (pin_inp == pin):
         print("\nYou have successfully logged in!\n")
         show_balance()
     else:
@@ -65,16 +64,19 @@ def show_balance():
         elif when_logged_inp == 0:
             print("Bye!")
             exit(0)
-            break
 
 
 while True:
     user_inp = input("1. Create an account\n2. Log into account\n0. Exit\n")
     if user_inp == '1':
         print("\nYour card has been created")
-        card_generator()
-        checksum()
-        pin_generator()
+        number = card_generator()
+        print("Your card number:\n", number, sep="")
+        pin = pin_generator()
+        print("Your card PIN:\n", pin, "\n", sep="")
+        insert_sql_statement = "INSERT INTO card (number, pin) VALUES ({}, {})".format(number, pin)
+        cur.execute(insert_sql_statement)
+        conn.commit()
         continue
     elif user_inp == '2':
         check()
